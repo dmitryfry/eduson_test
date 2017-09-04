@@ -1,0 +1,39 @@
+<h1> Главная страница </h1>
+
+<%= current_user.email  %>
+</br ></br ></br >
+<% if user_signed_in? %>
+  <li>
+  <%= link_to('Logout', destroy_user_session_path, method: :delete) %>
+  </li>
+<% else %>
+  <li>
+  <%= link_to('Login', new_user_session_path)  %>
+  </li>
+<% end %>
+</br ></br ></br >
+<% if current_user.admin? %>
+  <h3> Назначить пользователю или группе курсы</h3>
+
+  <p>Выберите пользователя:</p>
+  <%= form_tag('/create') do %>
+    <%= select_tag 'user_id', options_for_select(@users.map { |user| [user.email, user.id]})%>
+    <p>Выберите курс:</p>
+    <%= select_tag 'course_id', options_for_select(@courses.map {|course| [course.name, course.id]}) %>
+    </br ></br >
+    <%= submit_tag 'Назначить' %>
+  <% end %>
+<% else %>
+  <h3> Вам назначены следующие курсы для прохождения: </h3>
+
+  <% @appointment.each do |appo| %>
+    <% if appo.user_id == current_user.id %>
+      <% @courses.each do |course|%>
+        <% if course.id == appo.course_id %>
+          <span> Название курса: <%= course.name %></span>
+          <span> Дата проведения: <%= course.date %></span></br>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
